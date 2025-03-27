@@ -1,0 +1,2 @@
+# Roco-Kingdom-CDKey-Auto-Exchanger
+这是一个用于自动尝试兑换洛克王国世界测试资格码的Python工具。它使用Selenium自动化测试框架，模拟人工操作来尝试不同的资格码组合，直到成功兑换或手动停止。
