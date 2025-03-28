@@ -8,20 +8,25 @@
 - 🧠 **智能延迟调整**: 根据网络繁忙情况自动调整操作间隔
 - 👤 **模拟人工操作**: 随机化输入延迟与点击时机，降低被检测风险
 - 🔍 **自动处理各类弹窗**: 包括网络繁忙、兑换失败等弹窗
+- 🤖 **自动验证码识别**: 使用ddddocr库自动识别并处理验证码
+- 🎯 **精准结果判断**: 准确检测兑换结果，在成功时自动停止
 - 📊 **详细统计报告**: 实时显示运行时间、尝试次数和成功次数
 - 📝 **成功记录保存**: 自动将成功的兑换码保存到文件中
+- 💻 **跨平台兼容**: 同时支持Windows和Mac系统
 
 ## 安装要求
 
 - Python 3.6+
 - Selenium 库
+- ddddocr 库 (验证码识别)
+- Pillow 库 (图像处理)
 - Chrome 浏览器
 - 与Chrome版本匹配的ChromeDriver
 
 ### 安装依赖
 
 ```bash
-pip install selenium
+pip install selenium ddddocr pillow
 ```
 
 ## 使用方法
@@ -33,8 +38,10 @@ pip install selenium
 
 2. **配置ChromeDriver路径**
 
-   默认情况下，脚本会在以下位置查找ChromeDriver:
+   默认情况下，脚本会按以下优先级查找ChromeDriver:
+   - 脚本当前目录 (推荐方式，最简单)
    - Mac: `~/Downloads/chromedriver-mac-arm64/chromedriver` 或 `~/下载/chromedriver-mac-arm64/chromedriver`
+   - Windows: 自动查找带.exe后缀的chromedriver.exe
    - 如果找不到，脚本会提示输入正确路径
 
 3. **运行脚本**
@@ -47,9 +54,25 @@ pip install selenium
 
    脚本启动后会打开洛克王国资格码兑换页面，需要手动完成登录操作，登录成功后脚本会自动开始尝试兑换。
 
-5. **结束程序**
+5. **验证码处理**
 
-   按`Ctrl+C`可随时停止程序。
+   当出现验证码时，脚本会自动:
+   - 截取验证码图片
+   - 使用ddddocr识别验证码
+   - 模拟人工输入验证码
+   - 点击确认按钮提交
+
+6. **兑换结果检测**
+
+   脚本会精确检测兑换结果:
+   - 成功时: 记录成功信息并停止兑换
+   - 未知状态(非失败): 记录信息并停止兑换
+   - 失败时: 继续尝试下一个代码
+
+7. **结束程序**
+
+   程序在检测到成功兑换或未知状态(非失败)时会自动停止；
+   也可以按`Ctrl+C`随时手动停止程序。
 
 ## 资格码生成规则
 
@@ -74,19 +97,33 @@ pip install selenium
 
 - **generate_key()**: 按照规则生成18位资格码
 - **wait_for_login_complete()**: 等待用户完成登录
-- **is_exchange_successful()**: 检测兑换是否成功
+- **is_captcha_present()**: 检测是否出现验证码
+- **solve_captcha()**: 自动识别并处理验证码
+- **check_exchange_result()**: 精确检测兑换结果状态
 - **is_network_busy()**: 检测是否出现网络繁忙提示
 - **is_exchange_failed()**: 检测是否兑换失败
 - **handle_common_modal()**: 处理各类弹窗
 - **reset_page_if_needed()**: 检查并重置页面状态
 - **main()**: 主程序逻辑
 
+## 输出文件
+
+- **successful_keys.txt**: 记录成功兑换的资格码信息
+- **unknown_result_keys.txt**: 记录未知状态(非失败)的资格码信息
+
 ## 注意事项
 
 - 本工具仅供学习和研究自动化测试技术使用
 - 过于频繁的请求可能会导致IP被临时限制，请谨慎使用
-- 成功兑换的资格码会保存在`successful_keys.txt`文件中
+- 为避免被防爬虫机制检测，程序已添加智能延迟和人工操作模拟
+- 验证码识别准确率不能保证100%，但程序会自动重试
 - 根据网络状况，可能需要手动调整初始延迟时间
+
+## 平台兼容性
+
+- **Windows**: 完全兼容，自动处理路径和文件名差异
+- **Mac**: 完全兼容，支持中英文路径
+- **Linux**: 理论上兼容，未经充分测试
 
 ## 许可证
 
